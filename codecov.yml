@@ -12,6 +12,7 @@ coverage:
       app:
         target: 70
         threshold: 0.05
+        paths: "!test/"
       default:
         target: 79
         threshold: 0.05
@@ -27,3 +28,7 @@ comment:
 flags:
   alltests:
     joined: false
+ignore:
+  - "fisco-bcos"
+  - "tools"
+  
