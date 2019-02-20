@@ -43,7 +43,7 @@ Usage:
     -o <Output Dir>                     Default ./nodes/
     -p <Start Port>                     Default 30300,20200,8545 means p2p_port start from 30300, channel_port from 20200, jsonrpc_port from 8545
     -i <Host ip>                        Default 127.0.0.1. If set -i, listen 0.0.0.0
-    -c <Consensus Algorithm>            Default PBFT. If set -c, use raft
+    -c <Consensus Algorithm>            Default PBFT. If set -c, use Raft
     -s <State type>                     Default storage. if set -s, use mpt 
     -g <Generate guomi nodes>           Default no
     -z <Generate tar packet>            Default no
@@ -452,13 +452,15 @@ generate_config_ini()
 ;log configurations
 [log]
     ;the directory of the log
-    LOG_PATH=./log
+    log_path=./log
     ;log level INFO DEBUG TRACE
-    Level=${log_level}
-    MaxLogFileSize=209715200
+    level=${log_level}
+    max_log_file_size=209715200
+    ; control log auto_flush
+    flush=true
     ;easylog config
-    FORMAT=%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%msg
-    LOG_FLUSH_THRESHOLD=100
+    format=%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%msg
+    log_flush_threshold=100
 EOF
 }
 
@@ -783,8 +785,7 @@ generate_server_scripts()
     cat << EOF >> "$output/start_all.sh"
 for directory in \`ls \${SHELL_FOLDER}\`  
 do  
-    if [ -d "\${SHELL_FOLDER}/\${directory}" ];then  
-        if [[ \${directory} == *"sdk"* ]]; then continue;fi
+    if [[ -d "\${SHELL_FOLDER}/\${directory}" && -f "\${SHELL_FOLDER}/\${directory}/start.sh" ]];then  
         echo "start \${directory}" && bash \${SHELL_FOLDER}/\${directory}/start.sh
     fi  
 done  
@@ -793,8 +794,7 @@ EOF
     cat << EOF >> "$output/stop_all.sh"
 for directory in \`ls \${SHELL_FOLDER}\`  
 do  
-    if [ -d "\${SHELL_FOLDER}/\${directory}" ];then  
-        if [[ \${directory} == *"sdk"* ]]; then continue;fi
+    if [[ -d "\${SHELL_FOLDER}/\${directory}" && -f "\${SHELL_FOLDER}/\${directory}/stop.sh" ]];then  
         echo "stop \${directory}" && bash \${SHELL_FOLDER}/\${directory}/stop.sh
     fi  
 done  
