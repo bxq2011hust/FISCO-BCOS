@@ -50,6 +50,8 @@ include(EthCompilerSettings)
 include(EthDependencies)
 
 # install dependencies
+include(ProjectSnappy)
+include(ProjectLevelDB)
 include(ProjectMHD)
 include(ProjectCryptopp)
 include(ProjectSecp256k1)
@@ -88,6 +90,7 @@ add_subdirectory(libinitializer)
 add_subdirectory(libsecurity)
 # generate executable binary fisco-bcos
 add_subdirectory(fisco-bcos)
+add_subdirectory(extension)
 
 
 if (TESTS)
