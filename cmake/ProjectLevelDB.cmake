@@ -4,24 +4,35 @@ ExternalProject_Add(leveldb
     PREFIX ${CMAKE_SOURCE_DIR}/deps
     DOWNLOAD_NAME leveldb-1.20.tar.gz
     DOWNLOAD_NO_PROGRESS 1
-    URL https://codeload.github.com/google/leveldb/tar.gz/v1.20
-    URL_HASH SHA256=f5abe8b5b209c2f36560b75f32ce61412f39a2922f7045ae764a2c23335b6664
+    GIT_REPOSITORY https://github.com/google/leveldb.git
+    GIT_TAG 808e59e
+    GIT_SHALLOW true
+    CMAKE_COMMAND ${CMAKE_COMMAND}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+    -DCMAKE_POSITION_INDEPENDENT_CODE=${BUILD_SHARED_LIBS}
+    ${_only_release_configuration}
+    -DLEVELDB_BUILD_TESTS=Off
+    -DLEVELDB_BUILD_BENCHMARKS=Off
+    -DBUILD_SHARED_LIBS=Off
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    BUILD_COMMAND ""
+    UPDATE_DISCONNECTED 1
+    ${_overwrite_install_command}
     BUILD_IN_SOURCE 1
     LOG_CONFIGURE 1
+    LOG_DOWNLOAD 1
+    LOG_UPDATE 1
     LOG_BUILD 1
     LOG_INSTALL 1
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND make out-static/libleveldb.a
-    INSTALL_COMMAND ""
-    BUILD_BYPRODUCTS <SOURCE_DIR>/out-static/libleveldb.a
+    BUILD_BYPRODUCTS <INSTALL_DIR>/${CMAKE_INSTALL_LIBDIR}/libleveldb.a
 )
 
-ExternalProject_Get_Property(leveldb SOURCE_DIR)
+ExternalProject_Get_Property(leveldb INSTALL_DIR)
 add_library(LevelDB STATIC IMPORTED GLOBAL)
 
-set(LEVELDB_INCLUDE_DIR ${SOURCE_DIR}/include/)
-set(LEVELDB_LIBRARY ${SOURCE_DIR}/out-static/libleveldb.a)
-file(MAKE_DIRECTORY ${SOURCE_DIR}/out-shared)
+set(LEVELDB_INCLUDE_DIR ${INSTALL_DIR}/include/)
+set(LEVELDB_LIBRARY ${INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/libleveldb.a)
 file(MAKE_DIRECTORY ${LEVELDB_INCLUDE_DIR})  # Must exist.
 
 set_property(TARGET LevelDB PROPERTY IMPORTED_LOCATION ${LEVELDB_LIBRARY})
@@ -29,4 +40,4 @@ set_property(TARGET LevelDB PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${LEVELDB_INC
 set_property(TARGET LevelDB PROPERTY INTERFACE_LINK_LIBRARIES Snappy)
 
 add_dependencies(LevelDB leveldb)
-unset(SOURCE_DIR)
+unset(INSTALL_DIR)
