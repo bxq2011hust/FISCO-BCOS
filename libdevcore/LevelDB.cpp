@@ -64,7 +64,8 @@ leveldb::Options LevelDB::defaultDBOptions()
 {
     leveldb::Options options;
     options.create_if_missing = true;
-    options.max_open_files = 256;
+    options.max_open_files = 1000;
+    options.compression = leveldb::kNoCompression;
     return options;
 }
 
