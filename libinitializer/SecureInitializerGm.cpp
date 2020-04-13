@@ -122,10 +122,6 @@ ConfigResult initOriginConfig(const boost::property_tree::ptree& pt)
     std::shared_ptr<boost::asio::ssl::context> sslContext =
         std::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
 
-    std::shared_ptr<EC_KEY> ecdh(
-        EC_KEY_new_by_curve_name(NID_secp256k1), [](EC_KEY* p) { EC_KEY_free(p); });
-    SSL_CTX_set_tmp_ecdh(sslContext->native_handle(), ecdh.get());
-
     sslContext->set_verify_mode(boost::asio::ssl::context_base::verify_none);
     INITIALIZER_LOG(INFO) << LOG_BADGE("SecureInitializer") << LOG_DESC("get pub of node")
                           << LOG_KV("nodeID", keyPair.pub().hex());
@@ -253,10 +249,6 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
     std::shared_ptr<boost::asio::ssl::context> sslContext =
         std::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
 
-    std::shared_ptr<EC_KEY> ecdh(
-        EC_KEY_new_by_curve_name(NID_secp256k1), [](EC_KEY* p) { EC_KEY_free(p); });
-    SSL_CTX_set_tmp_ecdh(sslContext->native_handle(), ecdh.get());
-
     sslContext->set_verify_mode(boost::asio::ssl::context_base::verify_none);
     INITIALIZER_LOG(INFO) << LOG_BADGE("SecureInitializerGM") << LOG_DESC("get pub of node")
                           << LOG_KV("nodeID", keyPair.pub().hex());
@@ -264,7 +256,8 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
     boost::asio::const_buffer keyBuffer(keyContent.data(), keyContent.size());
     sslContext->use_private_key(keyBuffer, boost::asio::ssl::context::file_format::pem);
 
-    sslContext->use_certificate_file(enCert, boost::asio::ssl::context::file_format::pem);
+    // sslContext->use_certificate_file(enCert, boost::asio::ssl::context::file_format::pem);
+    SSL_CTX_use_enc_certificate_file(sslContext->native_handle(), enCert.c_str(), SSL_FILETYPE_PEM);
     if (SSL_CTX_use_enc_PrivateKey_file(
             sslContext->native_handle(), enKey.c_str(), SSL_FILETYPE_PEM) > 0)
     {
