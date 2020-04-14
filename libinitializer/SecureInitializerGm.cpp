@@ -261,23 +261,6 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
     INITIALIZER_LOG(INFO) << LOG_BADGE("SecureInitializerGM") << LOG_DESC("get pub of node")
                           << LOG_KV("nodeID", keyPair.pub().hex());
 
-    boost::asio::const_buffer keyBuffer(keyContent.data(), keyContent.size());
-    sslContext->use_private_key(keyBuffer, boost::asio::ssl::context::file_format::pem);
-
-    sslContext->use_certificate_file(enCert, boost::asio::ssl::context::file_format::pem);
-    if (SSL_CTX_use_enc_PrivateKey_file(
-            sslContext->native_handle(), enKey.c_str(), SSL_FILETYPE_PEM) > 0)
-    {
-        INITIALIZER_LOG(DEBUG) << LOG_BADGE("SecureInitializerGM")
-                               << LOG_DESC("use GM enc ca certificate") << LOG_KV("file", enKey);
-    }
-    else
-    {
-        INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
-                               << LOG_DESC("GM enc ca certificate not exists!");
-        BOOST_THROW_EXCEPTION(CertificateNotExists());
-    }
-
     if (!cert.empty() && !contents(cert).empty())
     {
         INITIALIZER_LOG(DEBUG) << LOG_BADGE("SecureInitializerGM")
@@ -290,6 +273,25 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
                                << LOG_DESC("certificate doesn't exist!");
         BOOST_THROW_EXCEPTION(CertificateNotExists());
     }
+
+    // load encrypt certificate after sign certificate
+    sslContext->use_certificate_file(enCert, boost::asio::ssl::context::file_format::pem);
+    if (SSL_CTX_use_PrivateKey_file(
+            sslContext->native_handle(), enKey.c_str(), SSL_FILETYPE_PEM) > 0)
+    {
+        INITIALIZER_LOG(DEBUG) << LOG_BADGE("SecureInitializerGM")
+                               << LOG_DESC("use GM enc ca certificate") << LOG_KV("file", enKey);
+    }
+    else
+    {
+        INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
+                               << LOG_DESC("GM enc ca certificate not exists!");
+        BOOST_THROW_EXCEPTION(CertificateNotExists());
+    }
+
+    // load encrypt key after encrypt certificate been loaded
+    boost::asio::const_buffer keyBuffer(keyContent.data(), keyContent.size());
+    sslContext->use_private_key(keyBuffer, boost::asio::ssl::context::file_format::pem);
 
     auto caCertContent = contents(caCert);
     if (!caCert.empty() && !caCertContent.empty())
