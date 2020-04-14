@@ -6,7 +6,7 @@ function(eth_apply TARGET REQUIRED)
 		#set_property(TARGET ${TARGET} PROPERTY INTERFACE_LINK_LIBRARIES ${TASSL_LIBRARIES})
 
 		if (APPLE)
-			set(OPENSSL_ROOT_DIR /usr/local/)
+			set(OPENSSL_ROOT_DIR /Users/baixingqiang/WorkSpace/git/GmSSL/)
 			if(NOT TESTS)
 				set(OPENSSL_USE_STATIC_LIBS TRUE)
 			endif()

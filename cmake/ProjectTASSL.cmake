@@ -25,7 +25,8 @@ if (BUILD_GM)
 		INSTALL_COMMAND ""
 	)
 
-	ExternalProject_Get_Property(tassl SOURCE_DIR)
+	# ExternalProject_Get_Property(tassl SOURCE_DIR)
+	set(SOURCE_DIR /Users/baixingqiang/WorkSpace/git/GmSSL)
 	add_library(TASSL STATIC IMPORTED)
 	set(TASSL_SUFFIX .a)
 	set(TASSL_INCLUDE_DIRS ${SOURCE_DIR}/include)

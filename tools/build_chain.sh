@@ -32,7 +32,8 @@ gm_conf_path="gmconf/"
 current_dir=$(pwd)
 consensus_type="pbft"
 supported_consensus=(pbft raft rpbft)
-TASSL_CMD="${HOME}"/.fisco/tassl
+export DYLD_FALLBACK_LIBRARY_PATH=/Users/baixingqiang/WorkSpace/git/GmSSL
+TASSL_CMD=/Users/baixingqiang/WorkSpace/git/GmSSL/apps/gmssl
 auto_flush="true"
 enable_statistic="false"
 enable_free_storage="false"
@@ -49,6 +50,7 @@ macOS=""
 x86_64_arch="true"
 download_timeout=240
 cdn_link_header="https://www.fisco.com.cn/cdn/fisco-bcos/releases/download"
+export DYLD_FALLBACK_LIBRARY_PATH=/Users/baixingqiang/WorkSpace/git/GmSSL
 
 help() {
     echo $1
@@ -393,7 +395,8 @@ gen_chain_cert_gm() {
     chaindir=$path
     mkdir -p $chaindir
 
-	$TASSL_CMD genpkey -paramfile gmsm2.param -out "$chaindir/gmca.key" 2> /dev/null
+	# $TASSL_CMD genpkey -paramfile gmsm2.param -out "$chaindir/gmca.key" 2> /dev/null
+    $TASSL_CMD genpkey -algorithm EC -pkeyopt ec_paramgen_curve:sm2p256v1 -outform PEM -out "$chaindir/gmca.key"
 	$TASSL_CMD req -config gmcert.cnf -x509 -days "${days}" -subj "/CN=${name}/O=fisco-bcos/OU=chain" -key "$chaindir/gmca.key" -extensions v3_ca -out "$chaindir/gmca.crt" 2> /dev/null
 }
 
@@ -409,7 +412,8 @@ gen_agency_cert_gm() {
     dir_must_not_exists "$agencydir"
     mkdir -p $agencydir
 
-    $TASSL_CMD genpkey -paramfile "$chain/gmsm2.param" -out "$agencydir/gmagency.key" 2> /dev/null
+    # $TASSL_CMD genpkey -paramfile "$chain/gmsm2.param" -out "$agencydir/gmagency.key" 2> /dev/null
+    $TASSL_CMD genpkey -algorithm EC -pkeyopt ec_paramgen_curve:sm2p256v1 -outform PEM -out "$agencydir/gmagency.key" 2> /dev/null
     $TASSL_CMD req -new -subj "/CN=${name}_son/O=fisco-bcos/OU=agency" -key "$agencydir/gmagency.key" -config "$chain/gmcert.cnf" -out "$agencydir/gmagency.csr" 2> /dev/null
     $TASSL_CMD x509 -req -CA "$chain/gmca.crt" -CAkey "$chain/gmca.key" -days 3650 -CAcreateserial -in "$agencydir/gmagency.csr" -out "$agencydir/gmagency.crt" -extfile "$chain/gmcert.cnf" -extensions v3_agency_root 2> /dev/null
     # cat "$chain/gmca.crt" >> "$agencydir/gmagency.crt"
@@ -424,7 +428,8 @@ gen_node_cert_with_extensions_gm() {
     type="$4"
     extensions="$5"
 
-    $TASSL_CMD genpkey -paramfile "$capath/gmsm2.param" -out "$certpath/gm${type}.key" 2> /dev/null
+    # $TASSL_CMD genpkey -paramfile "$capath/gmsm2.param" -out "$certpath/gm${type}.key" 2> /dev/null
+    $TASSL_CMD genpkey -algorithm EC -pkeyopt ec_paramgen_curve:sm2p256v1 -outform PEM -out "$certpath/gm${type}.key" 2> /dev/null
     $TASSL_CMD req -new -subj "/CN=$name/O=fisco-bcos/OU=${type}" -key "$certpath/gm${type}.key" -config "$capath/gmcert.cnf" -out "$certpath/gm${type}.csr" 2> /dev/null
     if [ -n "${no_agency}" ];then
         echo "not use $(basename $capath) to sign $(basename $certpath) ${type}" >>"${logfile}"
@@ -452,7 +457,7 @@ gen_node_cert_gm() {
     mkdir -p $ndpath
     gen_node_cert_with_extensions_gm "$agpath" "$ndpath" "$node" node v3_req
     if [ -z "${no_agency}" ];then cat "${agpath}/gmagency.crt" >> "$ndpath/gmnode.crt";fi
-    cat "${agpath}/../gmca.crt" >> "$ndpath/gmnode.crt"
+    # cat "${agpath}/../gmca.crt" >> "$ndpath/gmnode.crt"
     gen_node_cert_with_extensions_gm "$agpath" "$ndpath" "$node" ennode v3enc_req
     #nodeid is pubkey
     $TASSL_CMD ec -in "$ndpath/gmnode.key" -text -noout 2> /dev/null | sed -n '7,11p' | sed 's/://g' | tr "\n" " " | sed 's/ //g' | awk '{print substr($0,3);}'  | cat > "$ndpath/gmnode.nodeid"
