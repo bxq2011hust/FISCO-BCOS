@@ -255,9 +255,9 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
     std::shared_ptr<boost::asio::ssl::context> sslContext =
         std::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
 
-    std::shared_ptr<EC_KEY> ecdh(
-        EC_KEY_new_by_curve_name(NID_secp256k1), [](EC_KEY* p) { EC_KEY_free(p); });
-    SSL_CTX_set_tmp_ecdh(sslContext->native_handle(), ecdh.get());
+    // std::shared_ptr<EC_KEY> ecdh(
+    // EC_KEY_new_by_curve_name(NID_secp256k1), [](EC_KEY* p) { EC_KEY_free(p); });
+    // SSL_CTX_set_tmp_ecdh(sslContext->native_handle(), ecdh.get());
 
     // sslContext->set_verify_mode(boost::asio::ssl::context_base::verify_none);
     INITIALIZER_LOG(INFO) << LOG_BADGE("SecureInitializerGM") << LOG_DESC("get pub of node")
@@ -267,7 +267,7 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
     {
         INITIALIZER_LOG(DEBUG) << LOG_BADGE("SecureInitializerGM")
                                << LOG_DESC("use user certificate") << LOG_KV("file", cert);
-        // sslContext->use_certificate_chain_file(cert);
+        sslContext->use_certificate_chain_file(cert);
     }
     else
     {
@@ -278,7 +278,7 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
 
     // load encrypt key after encrypt certificate been loaded
     boost::asio::const_buffer keyBuffer(keyContent.data(), keyContent.size());
-    sslContext->use_certificate_file(cert, boost::asio::ssl::context::file_format::pem);
+    // sslContext->use_certificate_file(cert, boost::asio::ssl::context::file_format::pem);
     sslContext->use_private_key(keyBuffer, boost::asio::ssl::context::file_format::pem);
     // load encrypt certificate after sign certificate
     // sslContext->use_certificate_file(cert, boost::asio::ssl::context::file_format::pem);
@@ -318,45 +318,50 @@ ConfigResult initGmConfig(const boost::property_tree::ptree& pt)
                                << LOG_KV("file", caPath);
         sslContext->add_verify_path(caPath);
     }
+    //
     sslContext->set_verify_mode(boost::asio::ssl::context_base::verify_peer |
                                 boost::asio::ssl::verify_fail_if_no_peer_cert);
-    auto ssl = SSL_new(sslContext->native_handle());
-    int len = SSL_get1_curves(ssl, NULL);
-    int* list = new int[len];
-    SSL_get1_curves(ssl, list);
-    for (int i = 0; i < len; ++i)
-    {
-        cout << i << "=" << list[i] << endl;
-    }
 
+    // auto ssl = SSL_new(sslContext->native_handle());
+    // int len = SSL_get1_curves(ssl, NULL);
+    // int* list = new int[len];
+    // SSL_get1_curves(ssl, list);
+    // for (int i = 0; i < len; ++i)
+    // {
+    //     cout << i << "=" << list[i] << endl;
+    // }
+
+    // int curveIDs[] = {30, 22};
     // SSL_set_cipher_list(ssl, "ECDHE-SM2-WITH-SMS4-SM3:ECDHE-SM2-WITH-SMS4-SHA256");
-    // SSL_set1_groups(ssl, &curveIDs, 1);
-    int curveIDs[] = {30, 22};
+    // SSL_set1_groups(ssl, curveIDs, 2);
+
     // SSL_CTX_set1_groups(sslContext->native_handle(), curveIDs, 2);
-    int result = SSL_CTX_set1_curves(sslContext->native_handle(), curveIDs, 2);
-    if (result != 1)
-    {
-        int len = SSL_get1_curves(ssl, NULL);
-        int* list = new int[len];
-        SSL_get1_curves(ssl, list);
-        for (int i = 0; i < len; ++i)
-        {
-            cout << i << "=" << list[i] << endl;
-        }
-        INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
-                               << LOG_DESC("SSL_CTX_set1_curves failed!")
-                               << LOG_KV("return", result);
-        // BOOST_THROW_EXCEPTION(CertificateNotExists());
-    }
+    // int result = SSL_CTX_set1_curves(sslContext->native_handle(), curveIDs, 2);
+    // int result = SSL_CTX_set1_curves_list(sslContext->native_handle(), "sm2p256v1");
+    // if (result != 1)
+    // {
+    //     int len = SSL_get1_curves(ssl, NULL);
+    //     int* list = new int[len];
+    //     SSL_get1_curves(ssl, list);
+    //     for (int i = 0; i < len; ++i)
+    //     {
+    //         cout << i << "=" << list[i] << endl;
+    //     }
+    //     INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
+    //                            << LOG_DESC("SSL_CTX_set1_curves failed!")
+    //                            << LOG_KV("return", result);
+    //     // BOOST_THROW_EXCEPTION(CertificateNotExists());
+    // }
     // SSL_set1_curves(ssl, curveIDs, 2);
-    result = SSL_CTX_set_cipher_list(sslContext->native_handle(),
-        "ECC_SM4_SM3:ECDHE-SM2-SM4-SM3:ECDHE-SM2-WITH-SMS4-SM3:ECDHE-SM2-WITH-SMS4-SHA256");
-    if (result != 1)
-    {
-        INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
-                               << LOG_DESC("SSL_CTX_set_cipher_list failed!")
-                               << LOG_KV("return", result);
-    }
+
+    // int result =
+    //     SSL_CTX_set_cipher_list(sslContext->native_handle(), "SM2:ECDHE-SM2-WITH-SMS4-SM3");
+    // if (result != 1)
+    // {
+    //     INITIALIZER_LOG(ERROR) << LOG_BADGE("SecureInitializerGM")
+    //                            << LOG_DESC("SSL_CTX_set_cipher_list failed!")
+    //                            << LOG_KV("return", result);
+    // }
     return ConfigResult{keyPair, sslContext};
 }
 
