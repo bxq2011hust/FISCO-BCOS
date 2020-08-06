@@ -236,18 +236,35 @@ EVMHostContext::EVMHostContext(std::shared_ptr<StateFace> _s,
 
 evmc_result EVMHostContext::call(CallParameters& _p)
 {
+#if FISCO_DEBUG
+    uint64_t start = utcSteadyTimeUs();
+    uint64_t call=0;
+#endif
     Executive e{m_s, envInfo(), depth() + 1, m_freeStorage};
+
     // Note: When create initializes Executive, the flags of evmc context must be passed in
     if (!e.call(_p, gasPrice(), origin()))
     {
+#if FISCO_DEBUG
+    call = utcSteadyTimeUs();
+#endif
         go(depth(), e);
         e.accrueSubState(sub());
     }
+#if FISCO_DEBUG
+    uint64_t execute = utcSteadyTimeUs();
+#endif
     _p.gas = e.gas();
 
     evmc_result evmcResult;
     generateCallResult(&evmcResult, transactionExceptionToEvmcStatusCode(e.getException()), _p.gas,
         e.takeOutput());
+#if FISCO_DEBUG
+    LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG") << LOG_BADGE("EVMHostContext::call")
+               << LOG_KV("call(us)", call - start)
+               << LOG_KV("go(us)", execute - call)
+               << LOG_KV("timeUsed(us)", utcSteadyTimeUs() - start);
+#endif
     return evmcResult;
 }
 

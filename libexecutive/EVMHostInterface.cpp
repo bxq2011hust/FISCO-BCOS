@@ -193,6 +193,9 @@ evmc_result call(evmc_host_context* _context, const evmc_message* _msg) noexcept
         BOOST_THROW_EXCEPTION(eth::GasOverflow());
     }
 
+#if FISCO_DEBUG
+    uint64_t start = utcSteadyTimeUs();
+#endif
     auto& env = static_cast<EVMHostContext&>(*_context);
 
     // Handle CREATE separately.
@@ -208,7 +211,11 @@ evmc_result call(evmc_host_context* _context, const evmc_message* _msg) noexcept
     params.receiveAddress = _msg->kind == EVMC_CALL ? params.codeAddress : env.myAddress();
     params.data = {_msg->input_data, _msg->input_size};
     params.staticCall = (_msg->flags & EVMC_STATIC) != 0;
-
+#if FISCO_DEBUG
+    LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG")
+               << LOG_BADGE("init CallParameters")
+               << LOG_KV("timeUsed(us)", utcSteadyTimeUs() - start);
+#endif
     return env.call(params);
 }
 

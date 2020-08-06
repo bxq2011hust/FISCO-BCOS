@@ -252,8 +252,11 @@ bool Executive::call(CallParameters const& _p, u256 const& _gasPrice, Address co
 
 bool Executive::callRC2(CallParameters const& _p, u256 const& _gasPrice, Address const& _origin)
 {
+#if FISCO_DEBUG
+uint64_t start = utcSteadyTimeUs();
+    LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG") << LOG_BADGE("Executive::call start");
+#endif
     // no nonce increase
-
     m_savepoint = m_s->savepoint();
     m_tableFactorySavepoint = m_envInfo.precompiledEngine()->getMemoryTableFactory()->savepoint();
     m_gas = _p.gas;
@@ -365,7 +368,10 @@ bool Executive::callRC2(CallParameters const& _p, u256 const& _gasPrice, Address
         }
         m_excepted = TransactionException::CallAddressError;
     }
-
+#if FISCO_DEBUG
+        LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG") << LOG_BADGE("Executive::call end")
+                   << LOG_KV("timeUsed(us)", utcSteadyTimeUs() - start);
+#endif
     // no balance transfer
     return !m_ext;
 }
@@ -533,8 +539,9 @@ bool Executive::go()
 {
     if (m_ext)
     {
-#if ETH_TIMED_EXECUTIONS
-        Timer t;
+#if FISCO_DEBUG
+        uint64_t start = utcSteadyTimeUs();
+        LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG") << LOG_BADGE("Executive::go() start");
 #endif
         try
         {
@@ -607,6 +614,7 @@ bool Executive::go()
             {
                 auto mode = toRevision(m_ext->evmSchedule());
                 auto emvcMessage = getEVMCMessage();
+
                 auto ret = vm->exec(
                     *m_ext, mode, emvcMessage.get(), m_ext->code().data(), m_ext->code().size());
                 parseEVMCResult(ret);
@@ -687,9 +695,9 @@ bool Executive::go()
             // Another solution would be to reject this transaction, but that also
             // has drawbacks. Essentially, the amount of ram has to be increased here.
         }
-
-#if ETH_TIMED_EXECUTIONS
-        cnote << "VM took:" << t.elapsed() << "; gas used: " << (sgas - m_endGas);
+#if FISCO_DEBUG
+        LOG(DEBUG) << LOG_BADGE("FISCO_DEBUG") << LOG_BADGE("Executive::go() end")
+                   << LOG_KV("timeUsed(us)", utcSteadyTimeUs() - start);
 #endif
     }
     return true;
