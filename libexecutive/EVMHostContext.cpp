@@ -249,7 +249,7 @@ evmc_result EVMHostContext::call(CallParameters& _p)
     {
         ss << v;
     }
-    EXECUTIVE_LOG(ERROR) << "call data = " << ss.str();
+    EXECUTIVE_LOG(DEBUG) << "call data = " << ss.str();
     // Note: When create initializes Executive, the flags of evmc context must be passed in
     if (!e.call(_p, gasPrice(), origin()))
     {
@@ -561,6 +561,7 @@ bool EVMHostContext::transferAsset(
             auto tokenIDs = entry->getField("value");
             // find id in tokenIDs
             auto tokenID = to_string(_amountOrID);
+            // 333 find 3 is error
             std::size_t found = tokenIDs.find(tokenID);
             if (found != std::string::npos)
             {
