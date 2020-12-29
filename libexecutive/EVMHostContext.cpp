@@ -249,7 +249,6 @@ evmc_result EVMHostContext::call(CallParameters& _p)
     {
         ss << v;
     }
-    EXECUTIVE_LOG(DEBUG) << "call data = " << ss.str();
     // Note: When create initializes Executive, the flags of evmc context must be passed in
     if (!e.call(_p, gasPrice(), origin()))
     {
