@@ -380,7 +380,8 @@ bool EVMHostContext::issueFungibleAsset(
     auto issuer = Address(entry->getField(SYS_ASSET_ISSUER));
     if (caller() != issuer)
     {
-        EXECUTIVE_LOG(WARNING) << "issueFungibleAsset not issuer of " << _assetName;
+        EXECUTIVE_LOG(WARNING) << "issueFungibleAsset not issuer of " << _assetName
+                               << LOG_KV("issuer", issuer) << LOG_KV("caller", caller());
         return false;
     }
     // TODO: check supplied is less than total_supply
