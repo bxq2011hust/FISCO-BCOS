@@ -4,9 +4,9 @@ include(GNUInstallDirs)
 ExternalProject_Add(evmone
         PREFIX ${CMAKE_SOURCE_DIR}/deps
         DOWNLOAD_NO_PROGRESS 1
-        DOWNLOAD_NAME evmone-b004a8f2.tar.gz
-        URL https://github.com/FISCO-BCOS/evmone/archive/b004a8f2057bb2b91fabaa3b13449c62241bcaa8.tar.gz
-        URL_HASH SHA256=17fa57d444420f128af315b88e35b55747bb19b6bc1ef63ea01360d3e381a261
+        DOWNLOAD_NAME evmone-bc59e380.tar.gz
+        URL https://github.com/bxq2011hust/evmone/archive/bc59e38024e796c16aa637b8fed5e1b7995875ac.tar.gz
+        URL_HASH SHA256=897b175620fb3b23cac22253fb4aaf371ca4a96e42a26719abf5962f948715f0
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
                    -DBUILD_SHARED_LIBS=off
                    -DEVMC_ROOT=<INSTALL_DIR>
