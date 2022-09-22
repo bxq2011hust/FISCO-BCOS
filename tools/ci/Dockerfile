@@ -18,7 +18,7 @@ RUN apt-get -q update && apt-get install -qy --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/FISCO-BCOS/FISCO-BCOS.git && cd FISCO-BCOS \
-    && git checkout ${SOURCE} && if [[ "${TARGETARCH}" != "amd64" ]]; then cmake . ;else cmake -DARCH_NATIVE=on .;fi && make -j2 && strip bin/fisco-bcos
+    && git checkout ${SOURCE} && if [ "${TARGETARCH}" != "amd64" ]; then cmake . ;else cmake -DARCH_NATIVE=on .;fi && make -j2 && strip bin/fisco-bcos
 
 FROM ubuntu:20.04
 LABEL maintainer service@fisco.com.cn
