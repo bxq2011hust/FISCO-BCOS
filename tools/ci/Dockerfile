@@ -4,8 +4,10 @@ LABEL maintainer service@fisco.com.cn
 WORKDIR /
 
 ARG SOURCE_BRANCH
+ARG TARGETARCH
+
 ENV DEBIAN_FRONTEND=noninteractive \
-    SOURCE=${SOURCE_BRANCH:-master}
+    SOURCE=${SOURCE_BRANCH:-master-2.0}
 
 RUN apt-get -q update && apt-get install -qy --no-install-recommends \
     git clang make build-essential cmake libssl-dev zlib1g-dev ca-certificates \
@@ -16,7 +18,7 @@ RUN apt-get -q update && apt-get install -qy --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/FISCO-BCOS/FISCO-BCOS.git && cd FISCO-BCOS \
-    && git checkout ${SOURCE} && cmake . && make -j2 && strip bin/fisco-bcos
+    && git checkout ${SOURCE} && if [[ "${TARGETARCH}" != "amd64" ]]; then cmake . ;else cmake -DARCH_NATIVE=on .;fi && make -j2 && strip bin/fisco-bcos
 
 FROM ubuntu:18.04
 LABEL maintainer service@fisco.com.cn
