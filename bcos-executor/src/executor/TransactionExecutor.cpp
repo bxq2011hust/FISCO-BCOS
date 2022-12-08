@@ -223,6 +223,12 @@ void TransactionExecutor::initEvmEnvironment()
             std::make_shared<precompiled::ContractAuthMgrPrecompiled>(m_hashImpl, m_isWasm)});
     }
 
+
+    if (m_blockVersion >= (uint32_t)protocol::BlockVersion::V3_2_VERSION)
+    {
+        m_constantPrecompiled->insert(
+            {CAST_ADDRESS, std::make_shared<CastPrecompiled>(GlobalHashImpl::g_hashImpl)});
+    }
     if (m_blockVersion >= static_cast<uint32_t>(BlockVersion::V3_1_VERSION))
     {
         m_constantPrecompiled->insert(
@@ -286,6 +292,11 @@ void TransactionExecutor::initWasmEnvironment()
             std::make_shared<precompiled::ContractAuthMgrPrecompiled>(m_hashImpl, m_isWasm)});
     }
 
+    if (m_blockVersion >= (uint32_t)protocol::BlockVersion::V3_2_VERSION)
+    {
+        m_constantPrecompiled->insert(
+            {CAST_NAME, std::make_shared<CastPrecompiled>(GlobalHashImpl::g_hashImpl)});
+    }
     if (m_blockVersion >= static_cast<uint32_t>(BlockVersion::V3_1_VERSION))
     {
         m_constantPrecompiled->insert(
