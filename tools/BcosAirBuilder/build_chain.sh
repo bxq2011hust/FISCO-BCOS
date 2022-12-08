@@ -45,6 +45,7 @@ monitor_mode="false"
 auth_admin_account=
 binary_path=""
 lightnode_binary_path=""
+download_lightnode_binary="false"
 mtail_binary_path=""
 wasm_mode="false"
 serial_mode="false"
@@ -566,6 +567,7 @@ parse_params() {
             ;;
         L)
             lightnode_binary_path="$OPTARG"
+            download_lightnode_binary="true"
             ;;
         o)
             output_dir="$OPTARG"
@@ -1696,7 +1698,7 @@ deploy_nodes()
             LOG_FATAL "fisco bcos binary exec ${binary_path} not exist, Must copy binary file ${binary_name} to ${binary_path}"
         fi
     fi
-    if [ -z "${lightnode_binary_path}" ];then
+    if [ -z "${lightnode_binary_path}" ] && [ "${download_lightnode_binary}" == "true" ];then
         download_lightnode_bin
         echo "lightnode_binary_path is ${lightnode_binary_path}"
         if [[ ! -f "$lightnode_binary_path" ]]; then
