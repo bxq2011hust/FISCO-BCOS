@@ -32,6 +32,7 @@
 #include "../executive/ExecutiveStackFlow.h"
 #include "../executive/TransactionExecutive.h"
 #include "../precompiled/BFSPrecompiled.h"
+#include "../precompiled/CastPrecompiled.h"
 #include "../precompiled/ConsensusPrecompiled.h"
 #include "../precompiled/CryptoPrecompiled.h"
 #include "../precompiled/KVTablePrecompiled.h"
