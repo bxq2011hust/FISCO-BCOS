@@ -251,7 +251,7 @@ void TxPool::asyncVerifyBlock(PublicPtr _generatedNodeID, bytesConstRef const& _
                 onVerifyFinishedWrapper(nullptr, true);
                 return;
             }
-            TXPOOL_LOG(DEBUG) << LOG_DESC("asyncVerifyBlock")
+            TXPOOL_LOG(INFO) << LOG_DESC("asyncVerifyBlock")
                               << LOG_KV("consNum", blockHeader ? blockHeader->number() : -1)
                               << LOG_KV("totalTxs", block->transactionsHashSize())
                               << LOG_KV("missedTxs", missedTxs->size());
@@ -286,7 +286,7 @@ void TxPool::asyncNotifyTxsSyncMessage(Error::Ptr _error, std::string const& _uu
             }
             catch (std::exception const& e)
             {
-                TXPOOL_LOG(TRACE) << LOG_DESC("asyncNotifyTxsSyncMessage: sendResponse failed")
+                TXPOOL_LOG(WARNING) << LOG_DESC("asyncNotifyTxsSyncMessage: sendResponse failed")
                                   << LOG_KV("error", boost::diagnostic_information(e))
                                   << LOG_KV("uuid", _uuid) << LOG_KV("dst", _nodeID->shortHex());
             }
@@ -486,7 +486,7 @@ void TxPool::initSendResponseHandler()
                 _id, _moduleID, _dstNode, _data, [_id, _moduleID, _dstNode](Error::Ptr _error) {
                     if (_error)
                     {
-                        TXPOOL_LOG(TRACE) << LOG_DESC("sendResponse failed") << LOG_KV("uuid", _id)
+                        TXPOOL_LOG(WARNING) << LOG_DESC("sendResponse failed") << LOG_KV("uuid", _id)
                                           << LOG_KV("module", std::to_string(_moduleID))
                                           << LOG_KV("dst", _dstNode->shortHex())
                                           << LOG_KV("code", _error->errorCode())

@@ -52,6 +52,9 @@ void TransactionSync::onRecvSyncMessage(
         // receive txs request, and response the transactions
         if (txsSyncMsg->type() == TxsSyncPacketType::TxsRequestPacket)
         {
+            // TODO: delete log below
+            SYNC_LOG(INFO) << LOG_DESC("onRecvSyncMessage TxsRequestPacket")
+                           << LOG_KV("peer", _nodeID->shortHex());
             auto self = weak_from_this();
             m_worker->enqueue([self, txsSyncMsg, _sendResponse, _nodeID]() {
                 try
@@ -170,7 +173,7 @@ void TransactionSync::requestMissedTxs(PublicPtr _generatedNodeID, HashListPtr _
             // fetch missed txs from the given peer
             auto ledgerMissedTxs =
                 std::make_shared<HashList>(missedTxsSet->begin(), missedTxsSet->end());
-            SYNC_LOG(DEBUG)
+            SYNC_LOG(INFO)
                 << LOG_DESC("requestMissedTxs: missing txs from ledger and fetch from the peer")
                 << LOG_KV("txsSize", ledgerMissedTxs->size())
                 << LOG_KV("peer", _generatedNodeID->shortHex())
@@ -243,7 +246,6 @@ void TransactionSync::requestMissedTxsFromPeer(PublicPtr _generatedNodeID, HashL
         return;
     }
 
-
     auto protocolID = _verifiedProposal ? ModuleID::ConsTxsSync : ModuleID::TxsSync;
 
     auto txsRequest =
@@ -264,6 +266,11 @@ void TransactionSync::requestMissedTxsFromPeer(PublicPtr _generatedNodeID, HashL
                 }
                 auto networkT = utcTime() - startT;
                 auto recordT = utcTime();
+                SYNC_LOG(INFO) << LOG_DESC("requestMissedTxsFromPeer: response received")
+                               << LOG_KV("propIndex", proposalHeader->number())
+                               << LOG_KV("propHash", proposalHeader->hash().abridged())
+                               << LOG_KV("networkT", networkT)
+                               << LOG_KV("errMessage", _error ? _error->errorMessage() : "null");
                 transactionSync->verifyFetchedTxs(_error, _nodeID, _data, _missedTxs,
                     _verifiedProposal,
                     [networkT, recordT, proposalHeader, _onVerifyFinished](

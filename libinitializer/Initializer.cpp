@@ -173,9 +173,9 @@ void Initializer::init(bcos::protocol::NodeArchitectureType _nodeArchType,
             StorageInitializer::build(storagePath, option, m_protocolInitializer->dataEncryption(),
                 m_nodeConfig->keyPageSize(), m_nodeConfig->enableStatistics());
         schedulerStorage = storage;
+        airExecutorStorage = storage;
         consensusStorage = StorageInitializer::build(
             consensusStoragePath, option, m_protocolInitializer->dataEncryption(), 0);
-        airExecutorStorage = storage;
     }
 #ifdef WITH_TIKV
     else if (boost::iequals(m_nodeConfig->storageType(), "TiKV"))
