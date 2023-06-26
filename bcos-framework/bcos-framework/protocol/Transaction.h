@@ -76,6 +76,11 @@ public:
         {
             return;
         }
+#if 0
+        bcos::bytes sender = signatureData().getCroppedData(0, 20).toBytes();
+        forceSender(sender);
+        return;
+#endif
 
         auto hashResult = hash();
         // check the signatures

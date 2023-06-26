@@ -40,7 +40,7 @@
 #include "bcos-storage/RocksDBStorage.h"
 #include "bcos-tool/BfsFileFactory.h"
 #include "fisco-bcos-tars-service/Common/TarsUtils.h"
-#include "libinitializer/BaselineSchedulerInitializer.h"
+//#include "libinitializer/BaselineSchedulerInitializer.h"
 #include <bcos-crypto/hasher/AnyHasher.h>
 #include <bcos-crypto/interfaces/crypto/CommonType.h>
 #include <bcos-crypto/signature/key/KeyFactoryImpl.h>
@@ -173,6 +173,10 @@ void Initializer::init(bcos::protocol::NodeArchitectureType _nodeArchType,
             StorageInitializer::build(storagePath, option, m_protocolInitializer->dataEncryption(),
                 m_nodeConfig->keyPageSize(), m_nodeConfig->enableStatistics());
         schedulerStorage = storage;
+        airExecutorStorage = storage;
+        // Note: consensusStorage use different option
+        option.writeBufferSize = 64 << 20;
+        option.minWriteBufferNumberToMerge = 1;
         consensusStorage = StorageInitializer::build(
             consensusStoragePath, option, m_protocolInitializer->dataEncryption(), 0);
         airExecutorStorage = storage;
@@ -237,6 +241,7 @@ void Initializer::init(bcos::protocol::NodeArchitectureType _nodeArchType,
     auto useBaselineScheduler = m_nodeConfig->enableBaselineScheduler();
     if (useBaselineScheduler)
     {
+#if 0
         auto hasher = m_protocolInitializer->cryptoSuite()->hashImpl()->hasher();
         bcos::transaction_executor::GlobalHashImpl::g_hashImpl =
             m_protocolInitializer->cryptoSuite()->hashImpl();
@@ -294,6 +299,7 @@ void Initializer::init(bcos::protocol::NodeArchitectureType _nodeArchType,
                 m_baselineSchedulerInitializerHolder = [initializer = std::move(initializer)]() {};
             },
             baselineSchedulerInitializer);
+#endif
     }
     else
     {

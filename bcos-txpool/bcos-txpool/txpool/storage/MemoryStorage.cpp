@@ -170,6 +170,7 @@ std::vector<protocol::Transaction::ConstPtr> MemoryStorage::getTransactions(
 
 TransactionStatus MemoryStorage::txpoolStorageCheck(const Transaction& transaction)
 {
+return TransactionStatus::None;
     auto txHash = transaction.hash();
     TxsMap::ReadAccessor::Ptr accessor;
     auto has = m_txsTable.find<TxsMap::ReadAccessor>(accessor, txHash);
@@ -528,12 +529,13 @@ void MemoryStorage::batchRemove(BlockNumber batchId, TransactionSubmitResults co
     });
 
     auto nonceListPtr = std::make_shared<NonceList>(nonceListRange.begin(), nonceListRange.end());
-    m_config->txValidator()->ledgerNonceChecker()->batchInsert(batchId, nonceListPtr);
+    //m_config->txValidator()->ledgerNonceChecker()->batchInsert(batchId, nonceListPtr);
     auto updateLedgerNonceT = utcTime() - startT;
 
     startT = utcTime();
     // update the txpool nonce
-    m_config->txPoolNonceChecker()->batchRemove(*nonceListPtr);
+    
+//m_config->txPoolNonceChecker()->batchRemove(*nonceListPtr);
     auto updateTxPoolNonceT = utcTime() - startT;
 
     auto txs2Notify = results | RANGES::views::filter([](auto const& _result) {
@@ -769,10 +771,10 @@ void MemoryStorage::removeInvalidTxs(bool lock)
             txs2Remove.emplace(txHash, std::move(tx));
         });
 
-        auto invalidNonceList =
-            txs2Remove | RANGES::views::values |
-            RANGES::views::transform([](auto const& tx2Remove) { return tx2Remove->nonce(); });
-        m_config->txPoolNonceChecker()->batchRemove(invalidNonceList | RANGES::to_vector);
+        //auto invalidNonceList =
+         //   txs2Remove | RANGES::views::values |
+         //   RANGES::views::transform([](auto const& tx2Remove) { return tx2Remove->nonce(); });
+ //       m_config->txPoolNonceChecker()->batchRemove(invalidNonceList | RANGES::to_vector);
 
         /*
         m_txsTable.batchRemove(txs2Remove | RANGES::views::keys,

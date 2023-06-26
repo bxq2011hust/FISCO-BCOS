@@ -455,6 +455,8 @@ void JsonRpcImpl_2_0::sendTransaction(std::string_view groupID, std::string_view
                                     << LOG_KV("node", nodeName) << LOG_KV("isWasm", isWasm);
             }
 
+jResp["transactionHash"] = transaction->hash().hexPrefixed();
+respFunc(nullptr, jResp);
             auto start = utcSteadyTime();
             std::string extraData = std::string(transaction->extraData());
             co_await txpool->broadcastTransactionBuffer(bcos::ref(transactionData));
@@ -485,6 +487,7 @@ void JsonRpcImpl_2_0::sendTransaction(std::string_view groupID, std::string_view
                 jResp["extraData"] = extraData;
             }
 
+co_return;
 
             if (requireProof) [[unlikely]]
             {

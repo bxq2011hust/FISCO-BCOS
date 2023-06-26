@@ -35,6 +35,7 @@ void LedgerNonceChecker::initNonceCache(
 
 TransactionStatus LedgerNonceChecker::checkNonce(Transaction::ConstPtr _tx, bool _shouldUpdate)
 {
+return TransactionStatus::None;
     // check nonce
     auto status = TxPoolNonceChecker::checkNonce(_tx, _shouldUpdate);
     if (status != TransactionStatus::None)
