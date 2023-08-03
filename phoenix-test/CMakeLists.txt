@@ -1,0 +1,10 @@
+file(GLOB SRC_LIST "*.cpp")
+set(BINARY_NAME phoenix)
+add_executable(${BINARY_NAME} ${SRC_LIST})
+find_package(Boost REQUIRED exception)
+target_link_libraries(${BINARY_NAME} PUBLIC Boost::exception pthread)
+target_include_directories(${BINARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(${BINARY_NAME} PRIVATE -Wno-error)
+add_library(${PHOENIX_TEST_LIB} UnderlyingChaos.cpp PhoenixHookPosition.cpp)
+target_link_libraries(${PHOENIX_TEST_LIB} PUBLIC
+                     ${CRYPTO_TARGET} ${TOOL_TARGET} ${TARS_PROTOCOL_TARGET} ${SECURITY_TARGET})

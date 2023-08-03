@@ -22,6 +22,7 @@
 #include "bcos-txpool/sync/utilities/Common.h"
 #include <bcos-framework/protocol/CommonError.h>
 #include <bcos-framework/protocol/Protocol.h>
+#include "phoenix-test/UnderlyingChaos.h"
 
 using namespace bcos;
 using namespace bcos::sync;
@@ -251,6 +252,13 @@ void TransactionSync::requestMissedTxsFromPeer(PublicPtr _generatedNodeID, HashL
     auto encodedData = txsRequest->encode();
     auto startT = utcTime();
     auto self = weak_from_this();
+
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // // =========================== ADDED BY FCORLEONE ==========================
+    // auto hook_position = HookPosition::BEFORE_TX_REQUEST;
+    // phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(),m_nodeConfig->nodeName(),hook_position);
+
     m_config->frontService()->asyncSendMessageByNodeID(protocolID, std::move(_generatedNodeID),
         ref(*encodedData), m_config->networkTimeout(),
         [self, startT, _missedTxs, _verifiedProposal, proposalHeader, _onVerifyFinished](

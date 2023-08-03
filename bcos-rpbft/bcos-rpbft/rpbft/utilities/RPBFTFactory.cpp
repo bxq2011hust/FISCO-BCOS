@@ -31,7 +31,7 @@ using namespace bcos;
 using namespace bcos::consensus;
 using namespace bcos::protocol;
 
-PBFTImpl::Ptr RPBFTFactory::createRPBFT()
+PBFTImpl::Ptr RPBFTFactory::createRPBFT(std::shared_ptr<bcos::tool::NodeConfig> _nodeConfig)
 {
     auto pbftMessageFactory = std::make_shared<PBFTMessageFactoryImpl>();
     PBFT_LOG(INFO) << LOG_DESC("create PBFTCodec");
@@ -53,7 +53,7 @@ PBFTImpl::Ptr RPBFTFactory::createRPBFT()
             validator, m_frontService, stateMachine, pbftStorage, m_blockFactory);
 
     PBFT_LOG(INFO) << LOG_DESC("create rPBFTEngine");
-    auto pbftEngine = std::make_shared<PBFTEngine>(rpbftConfig);
+    auto pbftEngine = std::make_shared<PBFTEngine>(rpbftConfig, _nodeConfig);
 
     PBFT_LOG(INFO) << LOG_DESC("create rPBFT");
     auto ledgerFetcher = std::make_shared<bcos::tool::LedgerConfigFetcher>(m_ledger);

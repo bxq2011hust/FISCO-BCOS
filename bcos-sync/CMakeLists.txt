@@ -18,8 +18,6 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(bcos-sync VERSION ${VERSION})
-
 # proto generation
 set(PROTO_INPUT_PATH ${CMAKE_SOURCE_DIR}/bcos-sync)
 set(PROTO_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/)
@@ -51,8 +49,7 @@ include_directories(${PROTO_OUTPUT_PATH})
 file(GLOB_RECURSE SRCS bcos-sync/*.cpp)
 add_library(${SYNC_TARGET} ${SRCS} ${SYNC_SRCS})
 target_link_libraries(${SYNC_TARGET} PUBLIC ${STORAGE_TARGET} bcos-framework ${UTILITIES_TARGET} ${CODEC_TARGET} ${TOOL_TARGET} jsoncpp_static)
-
-
+target_include_directories(${SYNC_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}../)
 if (TESTS)
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)

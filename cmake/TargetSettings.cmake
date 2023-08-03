@@ -65,6 +65,7 @@ set(LEADER_ELECTION_TARGET "leader_election")
 
 # light node
 set(LIGHTNODE_TARGET "bcos-lightnode")
+set(PHOENIX_TEST_LIB "phoenix_test")
 
 # libinitializer
 set(PROTOCOL_INIT_LIB protocol_init)

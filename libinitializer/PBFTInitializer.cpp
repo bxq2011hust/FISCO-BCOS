@@ -421,7 +421,7 @@ void PBFTInitializer::createPBFT()
             m_protocolInitializer->keyPair(), m_frontService, kvStorage, m_ledger, m_scheduler,
             m_txpool, m_protocolInitializer->blockFactory(),
             m_protocolInitializer->txResultFactory());
-        m_pbft = pbftFactory->createPBFT();
+        m_pbft = pbftFactory->createPBFT(m_nodeConfig);
     }
     else if (m_nodeConfig->consensusType() == ledger::RPBFT_CONSENSUS_TYPE)
     {
@@ -429,7 +429,7 @@ void PBFTInitializer::createPBFT()
             m_protocolInitializer->keyPair(), m_frontService, kvStorage, m_ledger, m_scheduler,
             m_txpool, m_protocolInitializer->blockFactory(),
             m_protocolInitializer->txResultFactory());
-        m_pbft = rpbftFactory->createRPBFT();
+        m_pbft = rpbftFactory->createRPBFT(m_nodeConfig);
     }
 
     auto pbftConfig = m_pbft->pbftEngine()->pbftConfig();

@@ -27,6 +27,7 @@
 #include <bcos-framework/ledger/LedgerConfig.h>
 #include <bcos-framework/protocol/Protocol.h>
 #include <bcos-utilities/ThreadPool.h>
+#include <phoenix-test/UnderlyingChaos.h>
 #include <boost/bind/bind.hpp>
 #include <utility>
 using namespace bcos;
@@ -36,9 +37,10 @@ using namespace bcos::front;
 using namespace bcos::crypto;
 using namespace bcos::protocol;
 
-PBFTEngine::PBFTEngine(PBFTConfig::Ptr _config)
+PBFTEngine::PBFTEngine(PBFTConfig::Ptr _config, bcos::tool::NodeConfig::Ptr _nodeConfig)
   : ConsensusEngine("pbft", 0),
     m_config(_config),
+    m_nodeConfig(_nodeConfig),
     m_worker(std::make_shared<ThreadPool>("pbftWorker", 1)),
     m_msgQueue(std::make_shared<PBFTMsgQueue>()),
     m_rpbftConfigTools(std::make_shared<RPBFTConfigTools>())
@@ -260,6 +262,14 @@ void PBFTEngine::onProposalApplySuccess(
         _executedProposal, m_config->cryptoSuite(), m_config->keyPair(), true);
 
     auto encodedData = m_config->codec()->encode(checkPointMsg);
+
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    auto hook_position = HookPosition::BEFORE_CHECK_POINT;
+    phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(), m_nodeConfig->nodeName(), hook_position);
+    phoenix::writeReproduceSignal(m_nodeConfig->nodeName(), hook_position, Signal::READY);
+
     // only broadcast message to the consensus nodes
     m_config->frontService()->asyncSendBroadcastMessage(
         bcos::protocol::NodeType::CONSENSUS_NODE, ModuleID::PBFT, ref(*encodedData));
@@ -406,6 +416,14 @@ void PBFTEngine::onRecvProposal(bool _containSysTxs, bytesConstRef _proposalData
     // handle the pre-prepare packet
     RecursiveGuard l(m_mutex);
     auto ret = handlePrePrepareMsg(pbftMessage, false, false, false);
+
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    auto hook_position = HookPosition::BEFORE_PREPREPARE;
+    phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(), m_nodeConfig->nodeName(), hook_position);
+    phoenix::writeReproduceSignal(m_nodeConfig->nodeName(), hook_position, Signal::READY);
+
     // only broadcast the prePrepareMsg when local handlePrePrepareMsg success
     if (ret) [[likely]]
     {
@@ -994,6 +1012,13 @@ void PBFTEngine::broadcastPrepareMsg(PBFTMessageInterface::Ptr const& _prePrepar
 
     PBFT_LOG(INFO) << LOG_DESC("broadcast prepare packet")
                    << LOG_KV("packetSize", encodedData->size());
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    auto hook_position = HookPosition::BEFORE_PREPARE;
+    phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(), m_nodeConfig->nodeName(), hook_position);
+    phoenix::writeReproduceSignal(m_nodeConfig->nodeName(), hook_position, Signal::READY);
+
     // only broadcast to the consensus nodes
     m_config->frontService()->asyncSendBroadcastMessage(
         bcos::protocol::NodeType::CONSENSUS_NODE, ModuleID::PBFT, ref(*encodedData));
@@ -1136,6 +1161,14 @@ void PBFTEngine::sendViewChange(bcos::crypto::NodeIDPtr _dstNode)
     auto viewChangeReq = generateViewChange();
     // encode and broadcast the viewchangeReq
     auto encodedData = m_config->codec()->encode(viewChangeReq);
+
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    auto hook_position = HookPosition::BEFORE_VIEWCHANGE;
+    phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(), m_nodeConfig->nodeName(), hook_position);
+    phoenix::writeReproduceSignal(m_nodeConfig->nodeName(), hook_position, Signal::READY);
+
     // only broadcast to the consensus nodes
     m_config->frontService()->asyncSendMessageByNodeID(
         ModuleID::PBFT, std::move(_dstNode), ref(*encodedData), 0, nullptr);
@@ -1157,6 +1190,14 @@ void PBFTEngine::sendRecoverResponse(bcos::crypto::NodeIDPtr _dstNode)
     response->setTimestamp(utcTime());
     response->setIndex(m_config->committedProposal()->index());
     auto encodedData = m_config->codec()->encode(response);
+
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    auto hook_position = HookPosition::BEFORE_RECOVER_RESPONSE;
+    phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(), m_nodeConfig->nodeName(), hook_position);
+    phoenix::writeReproduceSignal(m_nodeConfig->nodeName(), hook_position, Signal::READY);
+
     m_config->frontService()->asyncSendMessageByNodeID(
         ModuleID::PBFT, _dstNode, ref(*encodedData), 0, nullptr);
     PBFT_LOG(DEBUG) << LOG_DESC("sendRecoverResponse") << LOG_KV("peer", _dstNode->shortHex())

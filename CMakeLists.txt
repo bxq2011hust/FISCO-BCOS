@@ -47,6 +47,7 @@ if(FULLNODE)
     include(ProjectSDF)
     include(ProjectITTAPI)
 
+    add_subdirectory(phoenix-test)
     add_subdirectory(bcos-codec)
     add_subdirectory(bcos-sealer)
     add_subdirectory(bcos-security)

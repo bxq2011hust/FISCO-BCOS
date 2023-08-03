@@ -53,6 +53,6 @@ public:
     RPBFTFactory(RPBFTFactory&&) = delete;
 
     ~RPBFTFactory() override = default;
-    PBFTImpl::Ptr createRPBFT();
+    PBFTImpl::Ptr createRPBFT(std::shared_ptr<bcos::tool::NodeConfig> _nodeConfig);
 };
 }  // namespace bcos::consensus

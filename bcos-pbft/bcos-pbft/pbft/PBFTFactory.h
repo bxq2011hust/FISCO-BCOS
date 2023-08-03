@@ -42,7 +42,7 @@ public:
         bcos::protocol::TransactionSubmitResultFactory::Ptr _txResultFactory);
 
     virtual ~PBFTFactory() = default;
-    virtual PBFTImpl::Ptr createPBFT();
+    virtual PBFTImpl::Ptr createPBFT(std::shared_ptr<bcos::tool::NodeConfig> _nodeConfig);
 
 protected:
     bcos::crypto::CryptoSuite::Ptr m_cryptoSuite;

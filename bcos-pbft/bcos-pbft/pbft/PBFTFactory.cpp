@@ -51,7 +51,7 @@ PBFTFactory::PBFTFactory(bcos::crypto::CryptoSuite::Ptr _cryptoSuite,
     m_txResultFactory(std::move(_txResultFactory))
 {}
 
-PBFTImpl::Ptr PBFTFactory::createPBFT()
+PBFTImpl::Ptr PBFTFactory::createPBFT(std::shared_ptr<bcos::tool::NodeConfig> _nodeConfig)
 {
     auto pbftMessageFactory = std::make_shared<PBFTMessageFactoryImpl>();
     PBFT_LOG(INFO) << LOG_DESC("create PBFTCodec");
@@ -73,7 +73,7 @@ PBFTImpl::Ptr PBFTFactory::createPBFT()
             validator, m_frontService, stateMachine, pbftStorage, m_blockFactory);
 
     PBFT_LOG(INFO) << LOG_DESC("create PBFTEngine");
-    auto pbftEngine = std::make_shared<PBFTEngine>(pbftConfig);
+    auto pbftEngine = std::make_shared<PBFTEngine>(pbftConfig, _nodeConfig);
 
     PBFT_LOG(INFO) << LOG_DESC("create PBFT");
     auto ledgerFetcher = std::make_shared<bcos::tool::LedgerConfigFetcher>(m_ledger);

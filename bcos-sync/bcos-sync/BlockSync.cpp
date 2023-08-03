@@ -22,7 +22,9 @@
 #include "bcos-framework/protocol/CommonError.h"
 #include <bcos-tool/LedgerConfigFetcher.h>
 #include <json/json.h>
+#include "phoenix-test/UnderlyingChaos.h"
 #include <boost/bind/bind.hpp>
+#include <utility>
 
 using namespace bcos;
 using namespace bcos::sync;
@@ -599,6 +601,13 @@ void BlockSync::requestBlocks(BlockNumber _from, BlockNumber _to)
                 blockRequest->setBlockInterval(interval);
             }
             auto encodedData = blockRequest->encode();
+
+            // add some chaos strategies
+            // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+            // =========================== ADDED BY FCORLEONE ==========================
+            // auto hook_position = HookPosition::BEFORE_BLOCK_REQUEST;
+            // phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(),m_nodeConfig->nodeName(),hook_position);
+
             m_config->frontService()->asyncSendMessageByNodeID(
                 ModuleID::BlockSync, _p->nodeId(), ref(*encodedData), 0, nullptr);
 
@@ -797,11 +806,39 @@ void BlockSync::fetchAndSendBlock(PublicPtr const& _peer, BlockNumber _number)
                 {
                     return;
                 }
+                // add some chaos strategies
+                // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+                // =========================== ADDED BY FCORLEONE ==========================
+                // int probability_chaos = getProbability();
+                // std::random_device rd;
+                // std::mt19937 gen(rd());
+                // std::uniform_real_distribution<> dis(0, 1);
+                // if(dis(gen) < (float)(probability_chaos * 1.0 / 100.0)){
+                //     writeStrategy("/tmp/phoenix/PHOENIX_HOOK_" + sync->m_config->nodeID()->hex()
+                //     + ".txt", std::time(0), sync->m_config->nodeID()->hex(),
+                //     HookPosition::BEFORE_BLOCK_SYNC, "555555555", "do not send block");
+                //     // just do not handle any block data
+                //     return;
+                // }
+
                 auto blockHeader = _block->blockHeader();
                 auto signature = blockHeader->signatureList();
                 auto config = sync->m_config;
                 auto blocksReq = config->msgFactory()->createBlocksMsg();
                 bytes blockData;
+                // add some chaos strategies
+                // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+                // =========================== ADDED BY FCORLEONE ==========================
+                // if(dis(gen) < (float)(probability_chaos * 1.0 / 100.0)){
+                //     // change the tx root
+                //     std::string hashStr =
+                //     "11995d8355cfa17f8e05254831997a8f22b2022728fefb747ed1226b5082aa2b"; h256
+                //     newRoot = h256(hashStr); blockHeader->setTxsRoot(newRoot);
+                //     _block->setBlockHeader(blockHeader);
+                //     writeStrategy("/tmp/phoenix/PHOENIX_HOOK_" + sync->m_config->nodeID()->hex()
+                //     + ".txt", std::time(0), sync->m_config->nodeID()->hex(),
+                //     HookPosition::BEFORE_BLOCK_SYNC, "666666666", "change block header");
+                // }
                 _block->encode(blockData);
                 blocksReq->appendBlockData(std::move(blockData));
                 blocksReq->setNumber(_number);
@@ -906,6 +943,12 @@ void BlockSync::broadcastSyncStatus()
     auto const& groupNodeList = m_config->groupNodeList();
     for (auto const& nodeID : groupNodeList)
     {
+    // add some chaos strategies
+    // +++++++++++++++++++++++++++++ PHONEIX CHAOS +++++++++++++++++++++++++++++
+    // =========================== ADDED BY FCORLEONE ==========================
+    // auto hook_position = HookPosition::BEFORE_SYNC_STATUS;
+    // auto hook_position = HookPosition::BEFORE_PEER_STATUS;
+    // phoenix::randomNetworkChaos(m_nodeConfig->p2pListenPort(),m_nodeConfig->nodeName(),hook_position);
         m_config->frontService()->asyncSendMessageByNodeID(
             ModuleID::BlockSync, nodeID, ref(*encodedData), 0, nullptr);
     }

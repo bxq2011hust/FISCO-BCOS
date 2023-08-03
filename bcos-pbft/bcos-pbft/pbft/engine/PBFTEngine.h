@@ -23,6 +23,7 @@
 #include "bcos-pbft/core/ConsensusEngine.h"
 #include "bcos-rpbft/bcos-rpbft/rpbft/config/RPBFTConfigTools.h"
 #include <bcos-tool/LedgerConfigFetcher.h>
+#include <bcos-tool/NodeConfig.h>
 #include <bcos-utilities/ConcurrentQueue.h>
 #include <bcos-utilities/Error.h>
 #include <bcos-utilities/Timer.h>
@@ -58,7 +59,8 @@ class PBFTEngine : public ConsensusEngine, public std::enable_shared_from_this<P
 public:
     using Ptr = std::shared_ptr<PBFTEngine>;
     using SendResponseCallback = std::function<void(bytesConstRef _respData)>;
-    explicit PBFTEngine(std::shared_ptr<PBFTConfig> _config);
+    explicit PBFTEngine(
+        std::shared_ptr<PBFTConfig> _config, std::shared_ptr<bcos::tool::NodeConfig> _nodeConfig);
     ~PBFTEngine() override { stop(); }
 
     void start() override;
@@ -69,6 +71,7 @@ public:
         std::function<void(Error::Ptr)> _onProposalSubmitted);
 
     std::shared_ptr<PBFTConfig> pbftConfig() { return m_config; }
+    std::shared_ptr<bcos::tool::NodeConfig> nodeConfig() { return m_nodeConfig; }
 
     // Receive PBFT message package from frontService
     virtual void onReceivePBFTMessage(bcos::Error::Ptr _error, std::string const& _id,
@@ -227,6 +230,8 @@ protected:
     // mainly maintains the node information, consensus configuration information
     // such as consensus node list, consensus weight, etc.
     std::shared_ptr<PBFTConfig> m_config;
+    // added by fcorleoen to get the p2p port
+    std::shared_ptr<bcos::tool::NodeConfig> m_nodeConfig;
     ThreadPool::Ptr m_worker;
 
     // PBFT message cache queue
