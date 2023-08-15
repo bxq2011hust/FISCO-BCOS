@@ -4,6 +4,8 @@
 #include "bcos-crypto/interfaces/crypto/KeyPairInterface.h"
 #include "bcos-framework/protocol/Transaction.h"
 #include "bcos-utilities/FixedBytes.h"
+#include "bcos-utilities/ratelimiter/TokenBucketRateLimiter.h"
+#include "bcos-utilities/ratelimiter/TimeWindowRateLimiter.h"
 #include <bcos-codec/abi/ContractABICodec.h>
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
@@ -24,7 +26,7 @@
 #include <thread>
 
 std::atomic_long blockNumber = 0;
-constexpr static long blockLimit = 500;
+constexpr static long blockLimit = 900;
 constexpr static int64_t initialValue = 1000000000;
 
 class PerformanceCallback : public bcos::sdk::Callback
@@ -218,7 +220,7 @@ void loopFetchBlockNumber(std::stop_token& token, bcos::sdk::RPCClient& rpcClien
         {
             std::cout << boost::diagnostic_information(e);
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -267,7 +269,8 @@ int main(int argc, char* argv[])
     }
     auto const& contractAddress = receipt->contractAddress();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::cout << "Contract address is:" << contractAddress << std::endl;
     auto balances = query(rpcClient, cryptoSuite, std::string(contractAddress), userCount);
     issue(rpcClient, cryptoSuite, keyPair, std::string(contractAddress), userCount, qps, balances);
     transfer(rpcClient, cryptoSuite, std::string(contractAddress), keyPair, userCount,
