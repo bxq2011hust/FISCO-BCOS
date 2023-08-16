@@ -2,8 +2,8 @@
   "registries": [
     {
       "kind": "git",
-      "repository": "https://github.com/bxq2011hust/registry",
-      "baseline": "3689be5906ca1fb0c4d8ce04764295395c0c3b68",
+      "repository": "https://github.com/FISCO-BCOS/registry",
+      "baseline": "0f429c72cae2829eb01afca7c4b7247c28029623",
       "packages": [
         "openssl",
         "evmone",
