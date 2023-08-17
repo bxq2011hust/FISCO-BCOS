@@ -23,6 +23,7 @@
 #include <bcos-utilities/Common.h>
 #include <bcos-utilities/DataConvertUtility.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <utility>
 #include <vector>
 
@@ -286,15 +287,13 @@ public:
     }
 
     template <class T>
-    requires std::signed_integral<T> &&(!std::same_as<T, char>)
-    bytes serialise(const T& _in)
+    requires std::signed_integral<T> &&(!std::same_as<T, char>)bytes serialise(const T& _in)
     {
         return serialise(s256(_in));
     }
 
     template <class T>
-    requires std::unsigned_integral<T> &&(!std::same_as<T, bool>)
-    bytes serialise(const T& _in)
+    requires std::unsigned_integral<T> &&(!std::same_as<T, bool>)bytes serialise(const T& _in)
     {
         return serialise(u256(_in));
     }
@@ -343,13 +342,14 @@ public:
 
     void deserialize(s256& out, std::size_t _offset);
 
+    uint64_t deserialize(std::size_t _offset);
     void deserialize(u256& _out, std::size_t _offset);
 
     void deserialize(bool& _out, std::size_t _offset);
 
     template <class T>
-    requires std::signed_integral<T> && (!std::same_as<T, char>)
-    void deserialize(T& _out, std::size_t _offset)
+    requires std::signed_integral<T> &&
+        (!std::same_as<T, char>)void deserialize(T& _out, std::size_t _offset)
     {
         s256 out;
         deserialize(out, _offset);
@@ -357,12 +357,11 @@ public:
     }
 
     template <class T>
-    requires std::unsigned_integral<T> && (!std::same_as<T, bool>)
-    void deserialize(T& _out, std::size_t _offset)
+    requires std::unsigned_integral<T> &&
+        (!std::same_as<T, bool>)void deserialize(T& _out, std::size_t _offset)
     {
-        u256 out;
-        deserialize(out, _offset);
-        _out = out.convert_to<T>();
+        auto out = deserialize(_offset);
+        _out = boost::lexical_cast<T>(out);
     }
 
     void deserialize(Address& _out, std::size_t _offset);
@@ -447,9 +446,7 @@ private:
         // dynamic type, offset position
         if (ABIDynamicType<T>::value)
         {
-            u256 dynamicOffset;
-            deserialize(dynamicOffset, offset);
-            _offset = static_cast<std::size_t>(dynamicOffset);
+            _offset = deserialize(offset);
         }
 
         deserialize(_t, _offset);
@@ -620,11 +617,10 @@ void ContractABICodec::deserialize(std::array<T, N>& _out, std::size_t _offset)
 template <class T>
 void ContractABICodec::deserialize(std::vector<T>& _out, std::size_t _offset)
 {
-    u256 length;
     // vector length
-    deserialize(length, _offset);
+    auto length = deserialize(_offset);
     _offset += MAX_BYTE_LENGTH;
-    _out.resize(static_cast<std::size_t>(length));
+    _out.resize(length);
 
     for (std::size_t u = 0; u < static_cast<std::size_t>(length); ++u)
     {
@@ -655,9 +651,7 @@ void ContractABICodec::deserialize(std::tuple<T...>& _out, std::size_t _offset)
                 typename std::remove_reference<decltype(_tupleItem)>::type>::type>::value)
         {
             // dynamic
-            u256 dynamicOffset;
-            deserialize(dynamicOffset, _offset + tupleOffset);
-            localOffset = _offset + static_cast<std::size_t>(dynamicOffset);
+            localOffset = _offset + static_cast<std::size_t>(deserialize(_offset + tupleOffset));
             deserialize(_tupleItem, localOffset);
         }
         else

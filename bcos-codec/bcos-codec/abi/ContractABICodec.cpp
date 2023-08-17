@@ -19,6 +19,9 @@
  */
 
 #include "ContractABICodec.h"
+#include <algorithm>
+#include <cstddef>
+#include <string>
 
 using namespace std;
 using namespace bcos;
@@ -42,9 +45,8 @@ bool ContractABICodec::abiOutByFuncSelector(
         }
         else if ("uint" == type || "uint256" == type)
         {
-            u256 u;
-            deserialize(u, offset);
-            _out.push_back(toString(u));
+            auto u = deserialize(offset);
+            _out.push_back(std::to_string(u));
         }
         else if ("address" == type)
         {
@@ -54,11 +56,8 @@ bool ContractABICodec::abiOutByFuncSelector(
         }
         else if ("string" == type)
         {
-            u256 stringOffset;
-            deserialize(stringOffset, offset);
-
             std::string str;
-            deserialize(str, static_cast<std::size_t>(stringOffset));
+            deserialize(str, static_cast<std::size_t>(deserialize(offset)));
             _out.push_back(str);
         }
         else
@@ -149,6 +148,15 @@ void ContractABICodec::deserialize(u256& _out, std::size_t _offset)
     validOffset(_offset + MAX_BYTE_LENGTH - 1);
 
     _out = fromBigEndian<u256>(data.getCroppedData(_offset, MAX_BYTE_LENGTH));
+}
+
+uint64_t ContractABICodec::deserialize(std::size_t _offset)
+{  // the offset will never exceed uint64_t, so we use uint64_t to store the length
+    validOffset(_offset + MAX_BYTE_LENGTH - 1);
+    const uint8_t* start = data.data() + _offset + 24;
+    uint64_t offset = 0;
+    std::reverse_copy(start, start + sizeof(uint64_t), (uint8_t*)&offset);
+    return offset;
 }
 
 void ContractABICodec::deserialize(bool& _out, std::size_t _offset)

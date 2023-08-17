@@ -67,7 +67,7 @@ std::vector<std::atomic_long> query(bcos::sdk::RPCClient& rpcClient,
             if (contractAddress == DAG_TRANSFER_ADDRESS)
             {
                 input = abiCodec.abiIn(
-                    "userBalance(string)", std::to_string(it), bcos::u256(initialValue));
+                    "userBalance(string)", std::to_string(it));
             }
             else
             {
@@ -320,7 +320,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Balance not match! " << balances[i] << " " << resultBalances[i]
                       << std::endl;
-            // return 1;
+            return 1;
         }
     }
     stopFlag = true;
