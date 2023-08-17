@@ -415,6 +415,7 @@ void PBFTEngine::onRecvProposal(bool _containSysTxs, bytesConstRef _proposalData
             bcos::protocol::NodeType::CONSENSUS_NODE, ModuleID::PBFT, ref(*encodedData));
         PBFT_LOG(INFO) << LOG_DESC("broadcast pre-prepare packet")
                        << LOG_KV("packetSize", encodedData->size())
+                       << LOG_KV("index", pbftMessage->index())
                        << LOG_KV("encode(ms)", encodeEnd - encodeStart)
                        << LOG_KV("asyncSend(ms)", utcTime() - encodeEnd);
     });

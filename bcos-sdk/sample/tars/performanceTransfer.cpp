@@ -320,7 +320,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Balance not match! " << balances[i] << " " << resultBalances[i]
                       << std::endl;
-            return 1;
+            exit(1);
         }
     }
     stopFlag = true;

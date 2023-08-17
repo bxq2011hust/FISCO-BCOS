@@ -24,6 +24,7 @@
 #include "bcos-executor/src/Common.h"
 #include "bcos-framework/executor/ExecutionMessage.h"
 #include <tbb/concurrent_unordered_map.h>
+#include <mutex>
 
 
 namespace bcos
@@ -38,7 +39,9 @@ public:
     void add(protocol::ExecutionMessage::UniquePtr result)
     {
         auto contextID = result->contextID();
+        x_contextID2Result.lock();
         m_contextID2Result.emplace(contextID, std::move(result));
+        x_contextID2Result.unlock();
     }
 
     std::vector<protocol::ExecutionMessage::UniquePtr> dumpAndClear()
@@ -56,11 +59,15 @@ public:
         return results;
     }
 
-    void clear() { m_contextID2Result.clear(); }
+    void clear()
+    {
+        std::lock_guard<std::mutex> guard(x_contextID2Result);
+        m_contextID2Result.clear();
+    }
 
 private:
-    tbb::concurrent_unordered_map<int64_t, protocol::ExecutionMessage::UniquePtr>
-        m_contextID2Result;
+    std::mutex x_contextID2Result;
+    std::map<int64_t, protocol::ExecutionMessage::UniquePtr> m_contextID2Result;
 };
 }  // namespace executor
 }  // namespace bcos
