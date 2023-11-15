@@ -463,7 +463,7 @@ protected:
     std::atomic<bcos::protocol::BlockNumber> m_sealEndIndex = {0};
 
     int64_t m_waterMarkLimit = 50;
-    std::atomic<int64_t> m_checkPointTimeoutInterval = {3000};
+    std::atomic<int64_t> m_checkPointTimeoutInterval = {4000};
     std::atomic<int64_t> m_minSealTime = {3000};
 
     std::atomic<uint64_t> m_leaderSwitchPeriod = {1};

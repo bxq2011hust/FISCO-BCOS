@@ -26,6 +26,7 @@
 
 #include <bcos-tars-protocol/impl/TarsSerializable.h>
 
+#include "rocksdb/statistics.h"
 #include "AuthInitializer.h"
 #include "BfsInitializer.h"
 #include "ExecutorInitializer.h"
