@@ -92,9 +92,7 @@ PrecompiledExecResult::Ptr PaillierPrecompiled::call(
         bytes result;
         try
         {
-            auto cipher1Str = toHex(cipher1);
-            auto cipher2Str = toHex(cipher2);
-            result = fromHex(m_callPaillier->paillierAdd(cipher1Str, cipher2Str));
+            result = m_callPaillier->paillierAdd(cipher1, cipher2);
             gasPricer->appendOperation(InterfaceOpcode::PaillierAdd);
             _callParameters->setExecResult(codec.encode(result));
         }
