@@ -54,9 +54,9 @@ public:
         rocksdb::DB* db = nullptr;
         rocksdb::Options options;
         // Note: This option will increase much memory
-        // options.IncreaseParallelism();
+        options.IncreaseParallelism(std::thread::hardware_concurrency());
         // Note: This option will increase much memory
-        // options.OptimizeLevelStyleCompaction();
+        options.OptimizeLevelStyleCompaction();
         // create the DB if it's not already present
         options.create_if_missing = true;
         // to mitigate write stalls
@@ -64,6 +64,7 @@ public:
         options.max_write_buffer_number = rocksDBOption.maxWriteBufferNumber;
         // FIXME: enable blob support when space amplification is acceptable
         // options.enable_blob_files = keyPageSize > 1 ? true : false;
+        options.enable_blob_files = true;
         options.bytes_per_sync = 1 << 20;  // 1MB
         // options.level_compaction_dynamic_level_bytes = true;
         // options.compaction_pri = rocksdb::kMinOverlappingRatio;
