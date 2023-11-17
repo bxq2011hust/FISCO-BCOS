@@ -42,6 +42,7 @@ struct RocksDBOption
     size_t writeBufferSize = 64 << 20;  // 64MB
     int minWriteBufferNumberToMerge = 1;
     size_t blockCacheSize = 128 << 20;  // 128MB
+    bool enable_blob_files = false;
 };
 
 class StorageInitializer
@@ -64,7 +65,7 @@ public:
         options.max_write_buffer_number = rocksDBOption.maxWriteBufferNumber;
         // FIXME: enable blob support when space amplification is acceptable
         // options.enable_blob_files = keyPageSize > 1 ? true : false;
-        options.enable_blob_files = true;
+        options.enable_blob_files = rocksDBOption.enable_blob_files;
         options.bytes_per_sync = 1 << 20;  // 1MB
         // options.level_compaction_dynamic_level_bytes = true;
         // options.compaction_pri = rocksdb::kMinOverlappingRatio;

@@ -129,6 +129,7 @@ public:
     size_t writeBufferSize() const { return m_writeBufferSize; }
     int minWriteBufferNumberToMerge() const { return m_minWriteBufferNumberToMerge; }
     size_t blockCacheSize() const { return m_blockCacheSize; }
+    bool enableRocksDBBlob() const { return m_enableRocksDBBlob; }
     std::vector<std::string> const& pdAddrs() const { return m_pd_addrs; }
     std::string const& pdCaPath() const { return m_pdCaPath; }
     std::string const& pdCertPath() const { return m_pdCertPath; }
@@ -363,6 +364,7 @@ private:
     size_t m_writeBufferSize = 64 << 21;
     int m_minWriteBufferNumberToMerge = 2;
     size_t m_blockCacheSize = 128 << 20;
+    bool m_enableRocksDBBlob = false;
 
     bool m_enableArchive = false;
     std::string m_archiveListenIP;
