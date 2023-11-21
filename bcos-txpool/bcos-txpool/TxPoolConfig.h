@@ -73,7 +73,6 @@ public:
     }
     std::shared_ptr<bcos::ledger::LedgerInterface> ledger() { return m_ledger; }
     int64_t blockLimit() const { return m_blockLimit; }
-
 private:
     TxValidatorInterface::Ptr m_txValidator;
     bcos::protocol::TransactionSubmitResultFactory::Ptr m_txResultFactory;
