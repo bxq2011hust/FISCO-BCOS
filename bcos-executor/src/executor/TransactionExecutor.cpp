@@ -263,8 +263,9 @@ void TransactionExecutor::initEvmEnvironment()
     m_precompiled->insert(CRYPTO_ADDRESS, std::make_shared<CryptoPrecompiled>(m_hashImpl));
     m_precompiled->insert(BFS_ADDRESS, std::make_shared<BFSPrecompiled>(m_hashImpl));
     m_precompiled->insert(PAILLIER_ADDRESS, std::make_shared<PaillierPrecompiled>(m_hashImpl),
-        [](uint32_t, bool, ledger::Features const& features) {
-            return features.get(ledger::Features::Flag::feature_paillier);
+        [](uint32_t, bool, [[maybe_unused]] ledger::Features const& features) {
+            // return features.get(ledger::Features::Flag::feature_paillier);
+            return true;
         });
     m_precompiled->insert(GROUP_SIG_ADDRESS, std::make_shared<GroupSigPrecompiled>(m_hashImpl));
     m_precompiled->insert(RING_SIG_ADDRESS, std::make_shared<RingSigPrecompiled>(m_hashImpl));
