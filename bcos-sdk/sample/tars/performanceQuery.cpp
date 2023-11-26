@@ -273,8 +273,6 @@ int main(int argc, char* argv[])
         .timeoutMs = 600000,
     };
     bcos::sdk::RPCClient rpcClient(config);
-    std::jthread getBlockNumber(
-        [&](std::stop_token token) { loopFetchBlockNumber(token, rpcClient); });
 
     auto cryptoSuite =
         std::make_shared<bcos::crypto::CryptoSuite>(std::make_shared<bcos::crypto::Keccak256>(),
@@ -305,7 +303,5 @@ int main(int argc, char* argv[])
     perfQuery(
         rpcClient, cryptoSuite, std::string(contractAddress), userCount, transactionCount, qps);
 
-    getBlockNumber.request_stop();
-    getBlockNumber.join();
     return 0;
 }
