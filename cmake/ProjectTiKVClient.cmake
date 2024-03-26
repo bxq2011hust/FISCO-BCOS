@@ -29,8 +29,7 @@ ExternalProject_Add(tikv_client_cpp
   PREFIX ${CMAKE_SOURCE_DIR}/deps
   # GIT_REPOSITORY https://${URL_BASE}/FISCO-BCOS/tikv-client-cpp.git
   GIT_REPOSITORY https://${URL_BASE}/bxq2011hust/tikv-client-cpp.git
-  GIT_TAG        179fa623cd48013ce342eba8de7022ba46eefbf3
-
+  GIT_TAG        7a2a2ffd293c2890fb2fe3bc38c204e80833e985
 
   BUILD_IN_SOURCE true
 #   PATCH_COMMAND ${CARGO_COMMAND} install cxxbridge-cmd@1.0.75
